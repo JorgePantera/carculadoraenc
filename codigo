@@ -15,7 +15,7 @@ namespace BadCalcVeryBad
     {
         public static readonly ArrayList G = new ArrayList(); 
         private static int counter = 0;
-        public string misc;
+        public string Misc { get; set; }
         public static int Counter => counter;
 
         public static void IncrementCounter()
@@ -26,39 +26,15 @@ namespace BadCalcVeryBad
 
     public class ShoddyCalc
     {
-        private double x;
-        private double y;
-        private string op;
-        private object any;
-
-        public double X
-        {
-            get { return x; }
-            set { x = value; }
-        }
-
-        public double Y
-        {
-            get { return y; }
-            set { y = value; }
-        }
-
-        public string Op
-        {
-            get { return op; }
-            set { op = value; }
-        }
-
-        public object Any
-        {
-            get { return any; }
-            set { any = value; }
-        }
+        public double x { get; set; }
+        public double y { get; set; }
+        public string op {  get; set; }
+        public object any { get; set; }
 
         private static readonly Random r = Random.Shared;
         public ShoddyCalc() { x = 0; y = 0; op = ""; any = null; }
 
-        public double DoIt(string a, string b, string o)
+        public static double DoIt(string a, string b, string o)
         {
             double A = 0, B = 0;
             try
@@ -111,8 +87,9 @@ namespace BadCalcVeryBad
     static class Program
     {
         private static U globals = new U();
+        private const string ErrorPrefix = "Error: ";
 
-static void Main(string[] args)
+        static void Main(string[] args)
     {
         try
         {
@@ -123,8 +100,6 @@ static void Main(string[] args)
             {
                 Console.WriteLine("Error: " + ex.Message);
             }
-
-            var calc1 = new ShoddyCalc();
 
             var opcion = MostrarMenuYLeerOpcion();
             if (opcion == "0")
@@ -148,7 +123,10 @@ static void Main(string[] args)
             {
                 res = EjecutarOperacion(opcion, a, b, operador);
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ErrorPrefix + ex.Message);
+            }
 
             GuardarEnHistorial(a, b, operador, res);
 
@@ -160,7 +138,10 @@ static void Main(string[] args)
             {
                 File.WriteAllText("leftover.tmp", string.Join(",", U.G.ToArray()));
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ErrorPrefix + ex.Message);
+            }
         }
 
     // =====================================================
@@ -235,9 +216,8 @@ static void Main(string[] args)
                 Console.WriteLine("b es 0 y o es 4");
             }
             {
-            var temp = new ShoddyCalc();
-            return temp.DoIt(a, (TryParse(b) + 0.0000001).ToString(), "/");
-        }
+                return ShoddyCalc.DoIt(a, (TryParse(b) + 0.0000001).ToString(), "/");
+            }
     }
 
     static void GuardarEnHistorial(string a, string b, string op, double res)
@@ -246,10 +226,13 @@ static void Main(string[] args)
             {
                 var linea = $"{a}|{b}|{op}|{res.ToString("0.###############", CultureInfo.InvariantCulture)}";
                 U.G.Add(linea);
-                globals.misc = linea;
+                globals.Misc = linea;
                 File.AppendAllText("history.txt", linea + Environment.NewLine);
             }
-            catch (Exception ) { }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ErrorPrefix + ex.Message);
+            }
         }
 
     // =====================================================
